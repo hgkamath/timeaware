@@ -7,6 +7,10 @@ TimeAware lets you configure it to issue vocal reminders by the minute. Some act
 
 TimeAware can help improve concentration and reduce mind drift, by providing an audio trigger.  The trigger could be as simple as just saying the time or saying something else to motivate. Having this play while wearing a headset allows for some privacy. 
 
+permissions: The app does not require permissions.
+
+privacy policy: The app does not collect any details.
+
 ## License
 Apache v 2.0 
 Open-source
