@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<!--
+    Copyright Ganapathi Kamath (2014)
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <!--<link rel="stylesheet" type="text/css" href="css/index.css" />-->
+        <link href="assets/ratchet/css/ratchet.css" rel="stylesheet">
+        <link href="assets/css/styles.css" rel="stylesheet">
+        <meta name="msapplication-tap-highlight" content="no" />
+        <title>Time Aware</title>
+    <style media="screen" type="text/css">
+.gkcontrol-item {
+  display: inline-block;
+}
+
+.gkcontrol-item > input {
+    visibility: hidden;
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+.gkcontrol-item > label {
+    background-color: #ccccff;
+    color: #000000;
+    font-size: 14px;
+  }
+
+.gkcontrol-item > input:checked + label {
+    background-color: #000077;
+    color: #ffffff;
+  }
+td {
+  align: center;
+}
+    </style>
+
+    </head>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="assets/ratchet/js/ratchet.js"></script>
+        <script type="text/javascript" src="jslib/jquery.js"></script>
+        <script type="text/javascript" src="jslib/router.js"></script>
+        <script type="text/javascript" src="jslib/fastclick.js"></script>
+        <script type="text/javascript" src="jslib/handlebars.js"></script>
+        <script type="text/javascript" src="jslib/moment.js"></script>
+        <script type="text/javascript" src="js/SpeakService.js"></script>
+        <script type="text/javascript" src="js/SpeakMgr.js"></script>
+        <script type="text/javascript" src="js/SpeakEditView.js"></script>
+        <script type="text/javascript" src="js/SpeakTableView.js"></script>
+        <script type="text/javascript" src="js/TimeAwareView.js"></script>
+        <script type="text/javascript" src="js/DeleteConfirmView.js"></script>
+        <script type="text/javascript" src="js/app.js"></script>
+<body>
+<script id="phrase-list-tpl" type="text/template">
+    <header class="bar bar-nav">
+        <h1 class="title">Time Aware</h1>
+        <img class="media-object pull-left" src="img/clock.svg" height="32px" width="32px">
+        <a href="#homemenu">
+        <!--<a href="#myPopover">-->
+          <span class="icon icon-bars pull-right"></span>
+        </a>
+    </header>
+    <div class="content">
+    <ul class="table-view">
+        {{#each this}}
+        <li class="table-view-cell media">
+          <a href="#speakitem/{{@index}}">
+              <div class="media-body">
+                  {{name}}
+                  <p>{{phrase}} </p>
+              </div>
+          </a>
+          <div id="tg{{@index}}" class="toggle pull-left {{#if benabled}}active{{/if}}  ">
+            <div class="toggle-handle">
+            </div>
+          </div>
+        </li>
+        {{/each}}
+    </ul>
+    </div>
+
+    <div id="homemenu" class="popover">
+      <header class="bar bar-nav">
+        <h1 class="title">Actions</h1>
+      </header>
+      <ul class="table-view">
+        <a href="#itemadd"><li class="table-view-cell">Add New Item</li></a>
+        <a href="#itemdummy"><li class="table-view-cell">Dummy Config Items</li></a>
+        <a href="#itempurge"><li class="table-view-cell">Reset Config</li></a>
+        <a href="#timeaware"><li class="table-view-cell">Run Time Aware</li></a>
+        <!--<a href="#about"><li class="table-view-cell">About</li></a>-->
+        <!--<li class="table-view-cell">Item4</li>-->
+      </ul>
+    </div>
+
+</script>
+<script id="phrase-edit-tpl" type="text/template">
+    <div class="view">
+    <header class="bar bar-nav">
+        <h1 class="title">{{title}}</h1>
+        <a href="#home">
+          <span class="icon icon-left-nav pull-left"></span>
+        </a>
+        {{#unless additem }}
+        <a href="#editmenu">
+          <span class="icon icon-bars pull-right"></span>
+        </a>
+        {{/unless}}
+    </header>
+    <div class="content">
+    <form  class="input-group">
+    <input name="ritemno" type="hidden" value='{{itemno}}'>
+    <input name="rbenabled" type="hidden" value='{{si.benabled}}'>
+    <div class="input-row">
+    <label>Name:</Label>
+    <input name="rname" type="text" placeholder="Descriptive Name" value='{{si.name}}'>
+    </div>
+    <div class="input-row">
+    <label>Phrase:</Label>
+    <input name="rphrase" type="text" placeholder="Phrase to say" value='{{si.phrase}}'>
+    </div>
+    <!--<div class="segmented-control">-->
+    <label>&nbsp;&nbsp;Select Minutes:</Label><br/>
+    <div>
+    <center>
+    <table width=200px>
+    <tr>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect00" value="00" {{#if si.tvect.[00]}}checked{{/if}}/><label for='rtvect00'>00</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect01" value="01" {{#if si.tvect.[01]}}checked{{/if}}/><label for='rtvect01'>01</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect02" value="02" {{#if si.tvect.[02]}}checked{{/if}}/><label for='rtvect02'>02</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect03" value="03" {{#if si.tvect.[03]}}checked{{/if}}/><label for='rtvect03'>03</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect04" value="04" {{#if si.tvect.[04]}}checked{{/if}}/><label for='rtvect04'>04</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect05" value="05" {{#if si.tvect.[05]}}checked{{/if}}/><label for='rtvect05'>05</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect06" value="06" {{#if si.tvect.[06]}}checked{{/if}}/><label for='rtvect06'>06</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect07" value="07" {{#if si.tvect.[07]}}checked{{/if}}/><label for='rtvect07'>07</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect08" value="08" {{#if si.tvect.[08]}}checked{{/if}}/><label for='rtvect08'>08</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect09" value="09" {{#if si.tvect.[09]}}checked{{/if}}/><label for='rtvect09'>09</label></span></td>
+    </tr>
+    <tr>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect10" value="10" {{#if si.tvect.[10]}}checked{{/if}}/><label for='rtvect10'>10</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect11" value="11" {{#if si.tvect.[11]}}checked{{/if}}/><label for='rtvect11'>11</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect12" value="12" {{#if si.tvect.[12]}}checked{{/if}}/><label for='rtvect12'>12</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect13" value="13" {{#if si.tvect.[13]}}checked{{/if}}/><label for='rtvect13'>13</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect14" value="14" {{#if si.tvect.[14]}}checked{{/if}}/><label for='rtvect14'>14</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect15" value="15" {{#if si.tvect.[15]}}checked{{/if}}/><label for='rtvect15'>15</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect16" value="16" {{#if si.tvect.[16]}}checked{{/if}}/><label for='rtvect16'>16</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect17" value="17" {{#if si.tvect.[17]}}checked{{/if}}/><label for='rtvect17'>17</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect18" value="18" {{#if si.tvect.[18]}}checked{{/if}}/><label for='rtvect18'>18</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect19" value="19" {{#if si.tvect.[19]}}checked{{/if}}/><label for='rtvect19'>19</label></span></td>
+    </tr>
+    <tr>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect20" value="20" {{#if si.tvect.[20]}}checked{{/if}}/><label for='rtvect20'>20</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect21" value="21" {{#if si.tvect.[21]}}checked{{/if}}/><label for='rtvect21'>21</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect22" value="22" {{#if si.tvect.[22]}}checked{{/if}}/><label for='rtvect22'>22</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect23" value="23" {{#if si.tvect.[23]}}checked{{/if}}/><label for='rtvect23'>23</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect24" value="24" {{#if si.tvect.[24]}}checked{{/if}}/><label for='rtvect24'>24</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect25" value="25" {{#if si.tvect.[25]}}checked{{/if}}/><label for='rtvect25'>25</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect26" value="26" {{#if si.tvect.[26]}}checked{{/if}}/><label for='rtvect26'>26</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect27" value="27" {{#if si.tvect.[27]}}checked{{/if}}/><label for='rtvect27'>27</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect28" value="28" {{#if si.tvect.[28]}}checked{{/if}}/><label for='rtvect28'>28</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect29" value="29" {{#if si.tvect.[29]}}checked{{/if}}/><label for='rtvect29'>29</label></span></td>
+    </tr>
+    <tr>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect30" value="30" {{#if si.tvect.[30]}}checked{{/if}}/><label for='rtvect30'>30</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect31" value="31" {{#if si.tvect.[31]}}checked{{/if}}/><label for='rtvect31'>31</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect32" value="32" {{#if si.tvect.[32]}}checked{{/if}}/><label for='rtvect32'>32</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect33" value="33" {{#if si.tvect.[33]}}checked{{/if}}/><label for='rtvect33'>33</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect34" value="34" {{#if si.tvect.[34]}}checked{{/if}}/><label for='rtvect34'>34</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect35" value="35" {{#if si.tvect.[35]}}checked{{/if}}/><label for='rtvect35'>35</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect36" value="36" {{#if si.tvect.[36]}}checked{{/if}}/><label for='rtvect36'>36</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect37" value="37" {{#if si.tvect.[37]}}checked{{/if}}/><label for='rtvect37'>37</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect38" value="38" {{#if si.tvect.[38]}}checked{{/if}}/><label for='rtvect38'>38</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect39" value="39" {{#if si.tvect.[39]}}checked{{/if}}/><label for='rtvect39'>39</label></span></td>
+    </tr>
+    <tr>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect40" value="40" {{#if si.tvect.[40]}}checked{{/if}}/><label for='rtvect40'>40</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect41" value="41" {{#if si.tvect.[41]}}checked{{/if}}/><label for='rtvect41'>41</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect42" value="42" {{#if si.tvect.[42]}}checked{{/if}}/><label for='rtvect42'>42</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect43" value="43" {{#if si.tvect.[43]}}checked{{/if}}/><label for='rtvect43'>43</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect44" value="44" {{#if si.tvect.[44]}}checked{{/if}}/><label for='rtvect44'>44</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect45" value="45" {{#if si.tvect.[45]}}checked{{/if}}/><label for='rtvect45'>45</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect46" value="46" {{#if si.tvect.[46]}}checked{{/if}}/><label for='rtvect46'>46</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect47" value="47" {{#if si.tvect.[47]}}checked{{/if}}/><label for='rtvect47'>47</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect48" value="48" {{#if si.tvect.[48]}}checked{{/if}}/><label for='rtvect48'>48</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect49" value="49" {{#if si.tvect.[49]}}checked{{/if}}/><label for='rtvect49'>49</label></span></td>
+    </tr>
+    <tr>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect50" value="50" {{#if si.tvect.[50]}}checked{{/if}}/><label for='rtvect50'>50</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect51" value="51" {{#if si.tvect.[51]}}checked{{/if}}/><label for='rtvect51'>51</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect52" value="52" {{#if si.tvect.[52]}}checked{{/if}}/><label for='rtvect52'>52</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect53" value="53" {{#if si.tvect.[53]}}checked{{/if}}/><label for='rtvect53'>53</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect54" value="54" {{#if si.tvect.[54]}}checked{{/if}}/><label for='rtvect54'>54</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect55" value="55" {{#if si.tvect.[55]}}checked{{/if}}/><label for='rtvect55'>55</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect56" value="56" {{#if si.tvect.[56]}}checked{{/if}}/><label for='rtvect56'>56</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect57" value="57" {{#if si.tvect.[57]}}checked{{/if}}/><label for='rtvect57'>57</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect58" value="58" {{#if si.tvect.[58]}}checked{{/if}}/><label for='rtvect58'>58</label></span></td>
+      <td><span class='gkcontrol-item'><input name="rtvect" type="checkbox" id="rtvect59" value="59" {{#if si.tvect.[59]}}checked{{/if}}/><label for='rtvect59'>59</label></span></td>
+    </tr>
+    </table>
+    </center>
+    </div>
+    </form>
+    <div class="input-row">
+    <center>
+    <!--<a id="pressedsubmit" class="button-main button-block">Submit</a>-->
+    <a href="#editsubmit"><label class="btn btn-positive btn-block" value="Update">Submit</label></a>
+    </center>
+    </div>
+    </div> <!-- content -->
+    </div> <!--view-->
+
+    <div id="editmenu" class="popover">
+    <!--<div id="editmenu" class="side-menu">-->
+      <ul class="table-view">
+        <a href="#itemdeleteconfirm/{{itemno}}"><li class="table-view-cell">Delete</li></a>
+        <!--<li class="table-view-cell">Item4</li>-->
+      </ul>
+    </div>
+    </script>
+
+<script id="time-aware-tpl" type="text/template">
+    <div class="view">
+    <header class="bar bar-nav">
+        <h1 class="title">Aware</h1>
+    </header>
+    <div class="content">
+      <div>
+      <p class="content-padded">Pace...</p>
+      </div>
+      <center>
+        <div class="input-row">
+          <a href="#home"><button class="btn">cancel</button></a>
+        </div>
+        <div>
+        <img src="img/clock.svg" width='200px' height='200px'/>
+        </div>
+        </center>
+      </p> 
+    </div> 
+    </div> <!-- view -->
+</script>
+<script id="delete-confirm-tpl" type="text/template">
+    <div class="view">
+    <header class="bar bar-nav">
+        <h1 class="title">Confirm Delete</h1>
+    </header>
+    <div class="content">
+      <div>
+      <p class="content-padded">Delete Item {{itemno}}: <b>{{si.name}}</b> {{si.phrase}} </p>
+      </div>
+        <div class="input-row">
+          <a href="#home"><button class="btn push-left">cancel</button></a>
+          <a href="#itemdelete/{{itemno}}"><button class="btn btn-negative push-right">DELETE</button></a>
+        </div>
+      </p> 
+    </div> 
+    </div> <!-- view -->
+</script>
+
+  <!--
+    <div id="about">
+    <header class="bar bar-nav">
+        <h1 class="title">About</h1>
+        <a href="#home">
+          <span class="icon icon-left-nav pull-left"></span>
+        </a>
+    </header>
+    <div class="content">
+      <div>
+      <p class="content-padded">An app that repeatedly tells the time.</p>
+      <p class="content-padded">Use %t as keyword for time</p> 
+    </div> 
+    </div> <!-- view --\>
+    -->
+
+
+        <div class="app">
+          <div id="deviceready"/>"
+            <!--<h1>Apache Cordova</h1>-->
+            <div id="deviceready" class="blink">
+                <p class="event listening"></p>
+                <p class="event received"></p>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript">
+            app.preinit(); 
+        </script>
+    </body>
+</html>

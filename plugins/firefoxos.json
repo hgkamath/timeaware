@@ -1,0 +1,18 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "de.appplant.cordova.plugin.background-mode": {
+            "PACKAGE_NAME": "com.ganasoft.timeaware"
+        },
+        "org.apache.cordova.speech.speechsynthesis": {
+            "PACKAGE_NAME": "com.ganasoft.timeaware"
+        }
+    },
+    "dependent_plugins": {}
+}
