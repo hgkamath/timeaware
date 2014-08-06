@@ -3,12 +3,9 @@
 #Time Aware
 Install app from Google [Play Store](https://play.google.com/store/apps/details?id=com.ganasoft.timeaware)
 
-For some activities, one may find it useful to be reminded of the time and the task at hand.
-TimeAware can be configured to speak various sentences at different minutes. 
-TimeAware uses TTS (Text to speech) to read the entered sentences aloud. TimeAware can help improve concentration and reduce mind drift, by providing an audio trigger. The trigger could be as simple as just saying the time or saying something else to motivate. 
+TimeAware lets you configure it to issue vocal reminders by the minute. Some activites, you may find it helpful to be reminded of the time and the task at hand. Each configurable item lets you set words to say and the time instants to say it. TimeAware uses the smartphone's TTS (Text to speech) engine to read aloud the custom sentences at the configured times. 
 
-permissions: The app does not require permissions.
-privacy policy: The app does not collect any details.
+TimeAware can help improve concentration and reduce mind drift, by providing an audio trigger.  The trigger could be as simple as just saying the time or saying something else to motivate. Having this play while wearing a headset allows for some privacy. 
 
 ## License
 Apache v 2.0 
