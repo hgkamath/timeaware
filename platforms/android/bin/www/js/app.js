@@ -206,6 +206,7 @@ var app = {
       var sis;
       //SpeakMgr.Load([]);
       SpeakMgr.init();
+      app.save_conf();
       //console.log('new conf')
       return ;
     },
@@ -223,13 +224,12 @@ var app = {
       var sis;
       var o1=localStorage.getItem('SpeakItems');
       if ( o1 == null ) {
-        new_conf();
-        dummy_conf();
+        app.new_conf();
+        app.dummy_conf();
       }else{
         sis=JSON.parse(o1);
         SpeakMgr.Load(sis);
       }
-      app.save_conf();
       return sis;
     },
     save_conf: function(){

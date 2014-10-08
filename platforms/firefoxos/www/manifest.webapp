@@ -3,9 +3,8 @@
     "installs_allowed_from": [
         "*"
     ],
-    "version": "0.0.2",
+    "version": "0.0.3",
     "name": "TimeAware",
-    "pkgName": "com.ganasoft.timeaware",
     "description": "A sample Apache Cordova application that responds to the deviceready event.",
     "developer": {
         "name": "Apache Cordova Team",

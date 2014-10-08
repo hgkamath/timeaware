@@ -27,6 +27,11 @@ contributions, bugfixes, improvements invited
 ## SOURCE
 https://github.com/hgkamath/timeaware
 
+#Changelog
+0.0.3 updated to cordova 3.6 framework
+0.0.2 created a default dummy config
+0.0.1 first release
+
 ## ScreenShots
 <img width="192" height="320" src="images/Screenshot_2014-08-05-04-50-42.png" alt="Home Screen"></img>
 <img width="192" height="320" src="images/Screenshot_2014-08-05-04-51-01.png" alt="Home Screen menu"></img>
